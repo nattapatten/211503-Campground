@@ -1,0 +1,343 @@
+{
+	"info": {
+		"_postman_id": "188b8663-aaee-4834-b46f-6811bb645e45",
+		"name": "VacQ_assignment12",
+		"description": "Back End API for receiving vaccine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9425037"
+	},
+	"item": [
+		{
+			"name": "Hospitals",
+			"item": [
+				{
+					"name": "Get All Hospitals",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"console.log(response);\r",
+									"\r",
+									"pm.test(\"There are some hospitals!!\" , ()=>{\r",
+									"    pm.expect(response.count).to.be.above(0);\r",
+									"})\r",
+									"\r",
+									"\r",
+									"\r",
+									"postman.setNextRequest(\"Create New Hospital\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/api/v1/hospitals",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hospitals"
+							]
+						},
+						"description": "Fetch All Hospitals"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Hospital",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"postman.setNextRequest(\"Update Single Hospital\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/api/v1/hospitals/:hospital_ID",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hospitals",
+								":hospital_ID"
+							],
+							"variable": [
+								{
+									"key": "hospital_ID",
+									"value": "{{global_hospital_ID}}"
+								}
+							]
+						},
+						"description": "Fetch single Hospital"
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Hospital",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"const new_hospital_id = response.data.id;\r",
+									"pm.globals.set(\"global_hospital_ID\",new_hospital_id);\r",
+									"\r",
+									"\r",
+									"\r",
+									"postman.setNextRequest(\"Get Single Hospital\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON Type",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"{{$randomFullName}}\",\r\n    \"address\":\"{{$randomStreetAddress}}\",\r\n    \"district\":\"Pakkret\",\r\n    \"province\":\"Nonthaburi\",\r\n    \"postalcode\":\"10110\",\r\n    \"tel\":\"02-8369999\",\r\n    \"region\":\"กรุงเทพมหานคร (Bangkok)\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/hospitals",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hospitals"
+							]
+						},
+						"description": "Create New Hospital API"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Single Hospital",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"postman.setNextRequest(\"Delete Single Hospital\");"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "JSON Type",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n     \"name\": \"{{$randomFullName}}\",\r\n     \"address\": \"{{$randomStreetAddress}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/hospitals/:hospital_ID",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hospitals",
+								":hospital_ID"
+							],
+							"variable": [
+								{
+									"key": "hospital_ID",
+									"value": "{{global_hospital_ID}}"
+								}
+							]
+						},
+						"description": "Update single Hospital API"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Single Hospital",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"postman.setNextRequest(null);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/api/v1/hospitals/:hospital_ID",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"hospitals",
+								":hospital_ID"
+							],
+							"variable": [
+								{
+									"key": "hospital_ID",
+									"value": "{{global_hospital_ID}}"
+								}
+							]
+						},
+						"description": "Delete single Hospital API"
+					},
+					"response": []
+				}
+			],
+			"description": "List Of Hospital 's API For Assignment 5"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://awsnattapatvacq.us-east-1.elasticbeanstalk.com",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1Y2RmMjIzMjEzZjc4ODQ3YzI4ZDY2MCIsImlhdCI6MTcxMzYxNzk2NSwiZXhwIjoxNzE2MjA5OTY1fQ.7WIyQaxemTZ0JMxKXr2eFRRhC7mopWHZkrdoPPEwGGA",
+			"type": "string"
+		}
+	]
+}
