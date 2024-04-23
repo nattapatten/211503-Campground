@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const HospitalSchema = new mongoose.Schema({
+const CampgroundSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, 'Please add a name'],
@@ -45,30 +45,30 @@ const HospitalSchema = new mongoose.Schema({
 });
 
 
-HospitalSchema.virtual('appointments', {
-    ref: 'Appointment',
+CampgroundSchema.virtual('bookings', {
+    ref: 'Booking',
     localField: '_id',
-    foreignField: 'hospital',
+    foreignField: 'campgournd',
     justOne: false
 
 });
 
 
-HospitalSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    console.log(`Appointments being removed from hospital ${this._id}`);
-    await this.model('Appointment').deleteMany({ hospital: this._id });
+CampgroundSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+    console.log(`Bookings being removed from campgournd ${this._id}`);
+    await this.model('Booking').deleteMany({ campgournd: this._id });
     next();
 });
 
 
 
 
-// HospitalSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-//     console.log(`Appointments being removed from hospital ${this._id}`);
-//     await this.model('Appointment').deleteMany({ hospital: this._id });
+// CampgroundSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+//     console.log(`Bookings being removed from campgournd ${this._id}`);
+//     await this.model('Booking').deleteMany({ campgournd: this._id });
 //     next();
 // });
 
 
 
-module.exports = mongoose.model('Hospital', HospitalSchema);
+module.exports = mongoose.model('Campground', CampgroundSchema);

@@ -37,11 +37,9 @@ const swaggerDocs = swaggerJsDoc(swaggerOption);
 connectDB();
 
 
-//‘ ’	" "	' '
-
-const hospitals = require('./routes/hospitals')
+const campgrounds = require('./routes/campgrounds')
 const auth = require('./routes/auth');
-const appointments = require('./routes/appointments');
+const bookings = require('./routes/bookings');
 
 const app = express();
 const mongoSanitize = require('express-mongo-sanitize');
@@ -69,9 +67,9 @@ app.use(xss());
 app.use(limiter);
 app.use(hpp());
 
-app.use('/api/v1/hospitals', hospitals);
+app.use('/api/v1/campgrounds', campgrounds);
 app.use('/api/v1/auth', auth);
-app.use('/api/v1/appointments', appointments);
+app.use('/api/v1/bookings', bookings);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 // app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 

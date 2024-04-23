@@ -1,12 +1,12 @@
 const express = require('express');
-const { getHospitals, getHospital, createHospital, updateHospital, deleteHospital, getVacCenters } = require('../controllers/hospitals');
+const { getCampgrounds, getCampground, createCampground, updateCampground, deleteCampground, getVacCenters } = require('../controllers/campgrounds');
 const { protect, authorize } = require('../middleware/auth');
 
 /**
 * @swagger
 * components:
 *   schemas:
-*     Hospital:
+*     Campground:
 *       type: object
 *       required:
 *         - name
@@ -15,14 +15,14 @@ const { protect, authorize } = require('../middleware/auth');
 *         id:
 *           type: string
 *           format: uuid
-*           description: The auto-generated id of the hospital
+*           description: The auto-generated id of the campground
 *           example: d290f1ee-6c54-4b01-90e6-d701748f0851
 *         ลําดับ:
 *           type: string
 *           description: Ordinal number
 *         name:
 *           type: string
-*           description: Hospital name
+*           description: Campground name
 *         address:
 *           type: string
 *           description: House No., Street, Road
@@ -44,7 +44,7 @@ const { protect, authorize } = require('../middleware/auth');
 *       example:
 *         id: 609bda561452242d88d36e37
 *         ลําดับ: "1"
-*         name: Happy Hospital
+*         name: Happy Campground
 *         address: 121 ถ.สุขุมวิท
 *         district: บางนา
 *         province: กรุงเทพมหานคร
@@ -56,75 +56,75 @@ const { protect, authorize } = require('../middleware/auth');
 /**
 * @swagger
 * tags:
-*   name: Hospitals
-*   description: The hospitals managing API
+*   name: Campgrounds
+*   description: The campgrounds managing API
 */
 
 
 /**
 * @swagger
-* /hospitals:
+* /campgrounds:
 *   get:
-*     summary: Returns the list of all the hospitals
+*     summary: Returns the list of all the campgrounds
 *     tags: 
-*       - Hospitals
+*       - Campgrounds
 *     responses:
 *       '200':
-*         description: The list of the hospitals
+*         description: The list of the campgrounds
 *         content:
 *           application/json:
 *             schema:
 *               type: array
 *               items:
-*                 $ref: '#/components/schemas/Hospital'
+*                 $ref: '#/components/schemas/Campground'
 */
 
 /**
 * @swagger
-* /hospitals/{id}:
+* /campgrounds/{id}:
 *   get:
-*     summary: Get the hospital by id
+*     summary: Get the campground by id
 *     tags: 
-*       - Hospitals
+*       - Campgrounds
 *     parameters:
 *       - in: path
 *         name: id
 *         schema:
 *           type: string
 *         required: true
-*         description: The hospital id
+*         description: The campground id
 *     responses:
 *       '200':
-*         description: The hospital description by id
+*         description: The campground description by id
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/components/schemas/Hospital'
+*               $ref: '#/components/schemas/Campground'
 *       '404':
-*         description: The hospital was not found
+*         description: The campground was not found
 */
 
 
 /**
 * @swagger
-* /hospitals:
+* /campgrounds:
 *   post:
-*     summary: Create a new hospital
+*     summary: Create a new campground
 *     tags:
-*       - Hospitals
+*       - Campgrounds
 *     requestBody:
 *       required: true
 *       content:
 *         application/json:
 *           schema:
-*             $ref: '#/components/schemas/Hospital'
+*             $ref: '#/components/schemas/Campground'
 *     responses:
 *       '201':
-*         description: The hospital was successfully created
+*         description: The campground was successfully created
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/components/schemas/Hospital'
+*               $ref: '#/components/schemas/Campground'
 *       '500':
 *         description: Some server error
 */
@@ -132,33 +132,33 @@ const { protect, authorize } = require('../middleware/auth');
 
 /**
 * @swagger
-* /hospitals/{id}:
+* /campgrounds/{id}:
 *   put:
-*     summary: Update the hospital by the id
+*     summary: Update the campground by the id
 *     tags:
-*       - Hospitals
+*       - Campgrounds
 *     parameters:
 *       - in: path
 *         name: id
 *         schema:
 *           type: string
 *         required: true
-*         description: The hospital id
+*         description: The campground id
 *     requestBody:
 *       required: true
 *       content:
 *         application/json:
 *           schema:
-*             $ref: '#/components/schemas/Hospital'
+*             $ref: '#/components/schemas/Campground'
 *     responses:
 *       '200':
-*         description: The hospital was updated
+*         description: The campground was updated
 *         content:
 *           application/json:
 *             schema:
-*               $ref: '#/components/schemas/Hospital'
+*               $ref: '#/components/schemas/Campground'
 *       '404':
-*         description: The hospital was not found
+*         description: The campground was not found
 *       '500':
 *         description: Some error happened
 */
@@ -166,46 +166,37 @@ const { protect, authorize } = require('../middleware/auth');
 
 /**
 * @swagger
-* /hospitals/{id}:
+* /campgrounds/{id}:
 *   delete:
-*     summary: Remove the hospital by id
+*     summary: Remove the campground by id
 *     tags:
-*       - Hospitals
+*       - Campgrounds
 *     parameters:
 *       - in: path
 *         name: id
 *         schema:
 *           type: string
 *         required: true
-*         description: The hospital id
+*         description: The campground id
 *     responses:
 *       '200':
-*         description: The hospital was deleted
+*         description: The campground was deleted
 *       '404':
-*         description: The hospital was not found
+*         description: The campground was not found
 */
 
 
 
 
 
-const appointmentRouter = require('./appointments');
+const bookingRouter = require('./bookings');
 
 const router = express.Router();
 
+router.use('/:campgroundId/bookings/', bookingRouter);
 
-
-
-router.use('/:hospitalId/appointments/', appointmentRouter);
-
-
-
-router.route('/vacCenters').get(getVacCenters);
-
-router.route('/').get(getHospitals).post(protect, authorize('admin'), createHospital);
-router.route('/:id').get(getHospital).put(protect, authorize('admin'), updateHospital).delete(protect, authorize('admin'), deleteHospital);
-
-
+router.route('/').get(getCampgrounds).post(protect, authorize('admin'), createCampground);
+router.route('/:id').get(getCampground).put(protect, authorize('admin'), updateCampground).delete(protect, authorize('admin'), deleteCampground);
 
 
 module.exports = router;
