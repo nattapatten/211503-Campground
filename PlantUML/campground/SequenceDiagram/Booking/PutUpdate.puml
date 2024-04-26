@@ -14,7 +14,7 @@ participant "<<model>>\n:AddOnService" as modelAddOnService
 database "<<MongoDB>>\n:bookingDB" as BookingDatabase
 
 client->server ++: req.put('/bookings/:id')
-server->routerBookings ++: app.use('/bookings', bookingsRouter)
+server->routerBookings ++: app.use('/bookings', bookings)
 routerBookings -> AuthMiddleware ++: protect, authorize('admin', 'user')
 AuthMiddleware -> controllersBookings ++: updateBooking()
 

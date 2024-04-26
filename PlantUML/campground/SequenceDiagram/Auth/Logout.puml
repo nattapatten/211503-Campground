@@ -10,7 +10,7 @@ participant "<<router>>\n:users" as routerUsers
 participant "<<controllers>>\n:users" as controllersUsers
 
 client->server ++: req.get('/logout')
-server->routerUsers ++: app.use('/users', usersRouter)
+server->routerUsers ++: app.use('/users', users)
 routerUsers -> controllersUsers ++: logout()
 
 controllersUsers -> controllersUsers : res.cookie('token', 'none', {expires, httpOnly})

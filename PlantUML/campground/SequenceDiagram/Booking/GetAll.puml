@@ -13,7 +13,7 @@ participant "<<model>>\n:Booking" as modelBooking
 database "<<MongoDB>>\n:bookingDB" as BookingDatabase
 
 client->server ++: req.get('/bookings' or '/campgrounds/:campgroundId/bookings')
-server->routerBookings ++: app.use('/bookings', bookingsRouter)
+server->routerBookings ++: app.use('/bookings', bookings)
 routerBookings -> AuthMiddleware ++: protect
 AuthMiddleware -> controllersBookings ++: getBookings()
 group User is admin

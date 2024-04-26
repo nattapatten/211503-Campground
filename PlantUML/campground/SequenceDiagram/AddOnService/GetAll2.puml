@@ -13,7 +13,7 @@ participant "<<model>>\n:AddOnService" as modelAddOnService
 database "<<MongoDB>>\n:addonservicesDB" as AddOnServicesDatabase
 
 client->server ++: req.get('/addonservices')
-server->routerAddOnServices ++: app.use('/addonservices', addonservicesRouter)
+server->routerAddOnServices ++: app.use('/addonservices', addonservices)
 routerAddOnServices -> AuthMiddleware ++: protect
 AuthMiddleware -> controllersAddOnServices ++: getAllAddOnService()
 

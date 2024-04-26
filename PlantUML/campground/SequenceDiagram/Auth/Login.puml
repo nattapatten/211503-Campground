@@ -12,7 +12,7 @@ participant "<<model>>\n:User" as modelUser
 database "<<MongoDB>>\n:usersDB" as UsersDatabase
 
 client->server ++: req.post('/login')
-server->routerUsers ++: app.use('/users', usersRouter)
+server->routerUsers ++: app.use('/users', users)
 routerUsers -> controllersUsers ++: login()
 
 controllersUsers -> modelUser ++: findOne({email})
