@@ -1,4 +1,4 @@
-@startuml User Logout
+@startuml Campground (User Logout)
 
 header Sample User Management Sequence Diagram
 footer Page %page% of %lastpage%

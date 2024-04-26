@@ -152,7 +152,7 @@ exports.updateAddOnService = async (req, res, next) => {
     try {
         const addonservice = await AddOnService.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
-            runValidators: true
+            runValidators: false
         });
         if (!addonservice) {
             return res.status(400).json({ success: false });
@@ -160,6 +160,7 @@ exports.updateAddOnService = async (req, res, next) => {
         res.status(200).json({ success: true, data: addonservice });
     }
     catch (err) {
+        console.log(err);
         res.status(400).json({ success: false });
     }
 };

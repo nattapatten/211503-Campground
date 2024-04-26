@@ -1,4 +1,4 @@
-@startuml Get Bookings
+@startuml Campground (Get Bookings)
 
 header Sample Booking Sequence Diagram
 footer Page %page% of %lastpage%
