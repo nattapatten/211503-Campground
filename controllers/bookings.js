@@ -1,6 +1,7 @@
 const Booking = require('../models/Booking');
 const Campground = require('../models/Campground');
-const mongoose = require('mongoose');
+const AddOnService = require('../models/AddOnService');  // Adjust the path according to your project structure
+
 
 exports.getBookings = async (req, res, next) => {
     console.log("getBookings")
@@ -105,13 +106,12 @@ exports.getBooking = async (req, res, next) => {
 }
 
 exports.addBooking = async (req, res, next) => {
-    console.log("addBooking")
+    console.log("addBooking");
     try {
         req.body.campground = req.params.campgroundId;
-
         console.log(req.body.campground);
-        const campground = await Campground.findById(req.params.campgroundId);
 
+        const campground = await Campground.findById(req.params.campgroundId);
         if (!campground) {
             return res.status(404).json({ success: false, message: `No campground with the id of ${req.params.campgroundId}` });
         }
@@ -119,29 +119,32 @@ exports.addBooking = async (req, res, next) => {
         req.body.user = req.user.id;
 
         const existedBookings = await Booking.find({ user: req.user.id });
-
         if (existedBookings.length >= 3 && req.user.role !== 'admin') {
             return res.status(400).json({ success: false, message: `The user with ID ${req.user.id} has already made 3 bookings` });
         }
 
-
-        //Add by nattapat.p
-        // Create an array to store add-on services
+        // Create an array to store add-on services with full details
         const addOnServices = [];
 
-        // Loop through the provided add-on services and add them to the array
+        // Ensure the addOnServices array from the request is properly handled
         if (req.body.addOnServices && Array.isArray(req.body.addOnServices)) {
-            for (const addOnService of req.body.addOnServices) {
-                // Correctly use 'new' to create a new ObjectId instance
-                addOnServices.push({ _id: new mongoose.Types.ObjectId(addOnService._id) });
+            for (const addOnServiceData of req.body.addOnServices) {
+                const addOnService = await AddOnService.findById(addOnServiceData._id);
+                if (addOnService) {
+                    addOnServices.push({
+                        _id: addOnService._id,
+                        serviceType: addOnService.serviceType,
+                        description: addOnService.description,
+                        price: addOnService.price,
+                        dynamicPrice: addOnService.dynamicPrice,
+                        quantity: addOnServiceData.quantity || 0  // Assuming you want to pass quantity at booking time
+                    });
+                }
             }
         }
 
-        // Set the add-on services array in the request body
+        // Assign the detailed add-on services to the booking
         req.body.addOnServices = addOnServices;
-        //End Add by nattapat.p
-
-
 
         const booking = await Booking.create(req.body);
         res.status(200).json({
@@ -150,10 +153,10 @@ exports.addBooking = async (req, res, next) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error(error);
         return res.status(500).json({ success: false, message: "Cannot create Booking" });
     }
-}
+};
 
 
 exports.updateBooking = async (req, res, next) => {
@@ -173,11 +176,20 @@ exports.updateBooking = async (req, res, next) => {
         // Create an array to store add-on services
         const addOnServices = [];
 
-        // Loop through the provided add-on services and add them to the array
+        // Ensure the addOnServices array from the request is properly handled
         if (req.body.addOnServices && Array.isArray(req.body.addOnServices)) {
-            for (const addOnService of req.body.addOnServices) {
-                // Correctly use 'new' to create a new ObjectId instance
-                addOnServices.push({ _id: new mongoose.Types.ObjectId(addOnService._id) });
+            for (const addOnServiceData of req.body.addOnServices) {
+                const addOnService = await AddOnService.findById(addOnServiceData._id);
+                if (addOnService) {
+                    addOnServices.push({
+                        _id: addOnService._id,
+                        serviceType: addOnService.serviceType,
+                        description: addOnService.description,
+                        price: addOnService.price,
+                        dynamicPrice: addOnService.dynamicPrice,
+                        quantity: addOnServiceData.quantity || 0  // Assuming you want to pass quantity at booking time
+                    });
+                }
             }
         }
 
