@@ -1,0 +1,23 @@
+@startuml Manage Campground (GET All)
+
+header Sample Campground Sequence Diagram
+footer Page %page% of %lastpage%
+title "Campground (GET All)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:campgrounds" as routerCampgrounds
+participant "<<controllers>>\n:campgrounds" as controllersCampgrounds
+participant "<<model>>\n:Campground" as modelCampground
+database "<<MongoDB>>\n:campgrounds" as CampgroundsDatabase
+
+client->server ++: req.get('/api/v1/campgrounds')
+server->routerCampgrounds ++: app.use('/campgrounds', campgrounds)
+routerCampgrounds -> controllersCampgrounds ++: getCampgrounds()
+controllersCampgrounds->modelCampground ++: find()
+modelCampground ->CampgroundsDatabase ++: find({})
+CampgroundsDatabase --> modelCampground --: campgrounds[]
+controllersCampgrounds <-- modelCampground --: campgrounds[]
+controllersCampgrounds->client --: response(campgrounds[])
+
+@enduml

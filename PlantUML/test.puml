@@ -1,0 +1,23 @@
+@startuml 
+header Sameple VacQ Sequence Diagram 
+footer Page %page% of %lastpage% 
+title "Manage Hospital (GET ALL)" 
+
+participant "Client" as client 
+participant ">\n:server" as server 
+participant ">\n:hospitals" as routerHospitals 
+participant ">\n:hospitals" as controllersHospitals 
+participant ">\n:Hospital" as modelHospital 
+database ">\n:hospitals" as HospitalsDatabase 
+
+
+client->server ++:req.get('/hospitals') 
+server->routerHospitals ++:app.use('/api/v1/hospitals',hospitals) 
+routerHospitals -> controllersHospitals ++:router.route('/').get(getHospitals) 
+controllersHospitals->modelHospital ++:getHospitals(req,res,next) 
+modelHospital ->HospitalsDatabase ++: HospitalSchema 
+HospitalsDatabase --> modelHospital --: hospital 
+controllersHospitals client --:response 
+
+
+@enduml

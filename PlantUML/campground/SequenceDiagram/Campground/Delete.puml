@@ -1,0 +1,32 @@
+@startuml Manage Campground (DELETE)
+
+header Sample Campground Sequence Diagram
+footer Page %page% of %lastpage%
+title "Manage Campground (DELETE)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:campgrounds" as routerCampgrounds
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:campgrounds" as controllersCampgrounds
+participant "<<model>>\n:Campground" as modelCampground
+database "<<MongoDB>>\n:campgrounds" as CampgroundsDatabase
+
+client->server ++: req.delete('/campgrounds/:id')
+server->routerCampgrounds ++: app.use('/campgrounds', campgrounds)
+routerCampgrounds -> AuthMiddleware ++: protect, authorize('admin')
+AuthMiddleware -> controllersCampgrounds ++: deleteCampground()
+controllersCampgrounds->modelCampground ++: findById(req.params.id)
+modelCampground -> CampgroundsDatabase ++: find({_id: req.params.id})
+CampgroundsDatabase --> modelCampground --: campground
+alt campground exists
+    controllersCampgrounds -> modelCampground ++: deleteOne()
+    modelCampground -> CampgroundsDatabase ++: delete({_id: req.params.id})
+    CampgroundsDatabase --> modelCampground --: deletionResult
+    controllersCampgrounds <-- modelCampground --: deletionResult
+    controllersCampgrounds->client --: response({ success: true, data: {} })
+else not found
+    controllersCampgrounds->client --: response({ success: false })
+end
+
+@enduml

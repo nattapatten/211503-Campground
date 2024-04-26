@@ -1,0 +1,29 @@
+@startuml Delete Add-On Service
+
+header Sample Add-On Services Sequence Diagram
+footer Page %page% of %lastpage%
+title "Delete Add-On Service"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:addonservices" as routerAddOnServices
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:addonservices" as controllersAddOnServices
+participant "<<model>>\n:AddOnService" as modelAddOnService
+database "<<MongoDB>>\n:addonservicesDB" as AddOnServicesDatabase
+
+client->server ++: req.delete('/addonservices/:id')
+server->routerAddOnServices ++: app.use('/addonservices', addonservicesRouter)
+routerAddOnServices -> AuthMiddleware ++: protect
+AuthMiddleware -> controllersAddOnServices ++: deleteAddOnService(req.params.id)
+
+controllersAddOnServices -> modelAddOnService ++: findById(req.params.id)
+alt service found
+    modelAddOnService -> AddOnServicesDatabase ++: deleteOne({_id: req.params.id})
+    AddOnServicesDatabase --> modelAddOnService --: deletionResult
+    controllersAddOnServices->client --: response({ success: true })
+else service not found
+    controllersAddOnServices->client --: response({ success: false })
+end
+
+@enduml

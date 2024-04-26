@@ -1,0 +1,26 @@
+@startuml Register User
+
+header Sample User Management Sequence Diagram
+footer Page %page% of %lastpage%
+title "User Registration"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:users" as routerUsers
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:users" as controllersUsers
+participant "<<model>>\n:User" as modelUser
+database "<<MongoDB>>\n:usersDB" as UsersDatabase
+
+client->server ++: req.post('/register')
+server->routerUsers ++: app.use('/users', usersRouter)
+routerUsers -> controllersUsers ++: register()
+
+controllersUsers -> modelUser ++: create({name, email, password, role})
+modelUser -> UsersDatabase ++: insert(user)
+UsersDatabase --> modelUser --: user
+
+controllersUsers -> controllersUsers : sendTokenResponse(user, 200, res)
+controllersUsers->client --: response({success: true, token})
+
+@enduml

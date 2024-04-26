@@ -1,0 +1,29 @@
+@startuml Update Add-On Service
+
+header Sample Add-On Services Sequence Diagram
+footer Page %page% of %lastpage%
+title "Update Add-On Service"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:addonservices" as routerAddOnServices
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:addonservices" as controllersAddOnServices
+participant "<<model>>\n:AddOnService" as modelAddOnService
+database "<<MongoDB>>\n:addonservicesDB" as AddOnServicesDatabase
+
+client->server ++: req.put('/addonservices/:id')
+server->routerAddOnServices ++: app.use('/addonservices', addonservicesRouter)
+routerAddOnServices -> AuthMiddleware ++: protect
+AuthMiddleware -> controllersAddOnServices ++: updateAddOnService(req.params.id, req.body)
+
+controllersAddOnServices -> modelAddOnService ++: findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+modelAddOnService -> AddOnServicesDatabase ++: update({_id: req.params.id}, addonserviceData)
+alt service updated
+    AddOnServicesDatabase --> modelAddOnService --: updatedAddonservice
+    controllersAddOnServices->client --: response({ success: true, data: updatedAddonservice })
+else service not found
+    controllersAddOnServices->client --: response({ success: false })
+end
+
+@enduml

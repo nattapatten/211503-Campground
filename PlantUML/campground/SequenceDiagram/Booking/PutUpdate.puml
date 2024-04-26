@@ -1,0 +1,51 @@
+@startuml Update Booking
+
+header Sample Booking Sequence Diagram
+footer Page %page% of %lastpage%
+title "Update Booking"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:bookings" as routerBookings
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:bookings" as controllersBookings
+participant "<<model>>\n:Booking" as modelBooking
+participant "<<model>>\n:AddOnService" as modelAddOnService
+database "<<MongoDB>>\n:bookingDB" as BookingDatabase
+
+client->server ++: req.put('/bookings/:id')
+server->routerBookings ++: app.use('/bookings', bookingsRouter)
+routerBookings -> AuthMiddleware ++: protect, authorize('admin', 'user')
+AuthMiddleware -> controllersBookings ++: updateBooking()
+
+controllersBookings -> modelBooking ++: findById(req.params.id)
+modelBooking -> BookingDatabase ++: findById(req.params.id)
+alt booking exists
+    BookingDatabase --> modelBooking --: booking
+else booking does not exist
+    BookingDatabase --> modelBooking --: null
+    controllersBookings->client --: response({ success: false, message: 'No booking with the id' })
+    return
+end
+
+alt user is owner or admin
+    loop for each addOnService
+        controllersBookings -> modelAddOnService ++: findById(addOnServiceData._id)
+        modelAddOnService -> BookingDatabase ++: findById(addOnServiceData._id)
+        alt service exists
+            BookingDatabase --> modelAddOnService --: addOnService
+            controllersBookings -> controllersBookings ++: collect addOnService details
+        else service does not exist
+            BookingDatabase --> modelAddOnService --: null
+        end
+    end
+    controllersBookings -> modelBooking ++: findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
+    modelBooking -> BookingDatabase ++: findByIdAndUpdate(req.params.id)
+    BookingDatabase --> modelBooking --: updatedBooking
+    controllersBookings->client --: response({ success: true, data: updatedBooking })
+else unauthorized user
+    controllersBookings->client --: response({ success: false, message: 'User not authorized to update this booking' })
+    return
+end
+
+@enduml

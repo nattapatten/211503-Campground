@@ -1,0 +1,29 @@
+@startuml Manage Campground (PUT)
+
+header Sample Campground Sequence Diagram
+footer Page %page% of %lastpage%
+title "Manage Campground (PUT)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:campgrounds" as routerCampgrounds
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:campgrounds" as controllersCampgrounds
+participant "<<model>>\n:Campground" as modelCampground
+database "<<MongoDB>>\n:campgrounds" as CampgroundsDatabase
+
+client->server ++: req.put('/campgrounds/:id')
+server->routerCampgrounds ++: app.use('/campgrounds', campgrounds)
+routerCampgrounds -> AuthMiddleware ++: protect, authorize('admin')
+AuthMiddleware -> controllersCampgrounds ++: updateCampground()
+controllersCampgrounds->modelCampground ++: findByIdAndUpdate(req.params.id, req.body)
+modelCampground ->CampgroundsDatabase ++: findByIdAndUpdate({_id: req.params.id}, {$set: req.body})
+CampgroundsDatabase --> modelCampground --: updatedCampground
+alt updatedCampground found
+    controllersCampgrounds <-- modelCampground --: updatedCampground
+    controllersCampgrounds->client --: response({ success: true, data: updatedCampground })
+else not found
+    controllersCampgrounds->client --: response({ success: false })
+end
+
+@enduml

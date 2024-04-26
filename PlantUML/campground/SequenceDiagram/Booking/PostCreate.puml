@@ -1,0 +1,58 @@
+@startuml Add Booking
+
+header Sample Booking Sequence Diagram
+footer Page %page% of %lastpage%
+title "Add Booking"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:bookings" as routerBookings
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:bookings" as controllersBookings
+participant "<<model>>\n:Campground" as modelCampground
+participant "<<model>>\n:Booking" as modelBooking
+participant "<<model>>\n:AddOnService" as modelAddOnService
+database "<<MongoDB>>\n:bookingDB" as BookingDatabase
+
+client->server ++: req.post('/campgrounds/:campgroundId/bookings')
+server->routerBookings ++: app.use('/bookings', bookingsRouter)
+routerBookings -> AuthMiddleware ++: protect, authorize('admin', 'user')
+AuthMiddleware -> controllersBookings ++: addBooking()
+
+controllersBookings -> modelCampground ++: findById(req.params.campgroundId)
+modelCampground -> BookingDatabase ++: findById(req.params.campgroundId)
+alt campground exists
+    BookingDatabase --> modelCampground --: campground
+else campground does not exist
+    BookingDatabase --> modelCampground --: null
+    controllersBookings->client --: response({ success: false, message: 'No campground with the id' })
+    return
+end
+
+controllersBookings -> modelBooking ++: find({user: req.user.id})
+modelBooking -> BookingDatabase ++: find({user: req.user.id})
+alt less than 3 bookings or admin
+    BookingDatabase --> modelBooking --: bookings
+else already 3 bookings
+    BookingDatabase --> modelBooking --: bookings
+    controllersBookings->client --: response({ success: false, message: 'User has already made 3 bookings' })
+    return
+end
+
+loop for each addOnService
+    controllersBookings -> modelAddOnService ++: findById(addOnServiceData._id)
+    modelAddOnService -> BookingDatabase ++: findById(addOnServiceData._id)
+    alt service exists
+        BookingDatabase --> modelAddOnService --: addOnService
+        controllersBookings -> controllersBookings ++: collect addOnService details
+    else service does not exist
+        BookingDatabase --> modelAddOnService --: null
+    end
+end
+
+controllersBookings -> modelBooking ++: create(req.body)
+modelBooking -> BookingDatabase ++: create(req.body)
+BookingDatabase --> modelBooking --: newBooking
+controllersBookings->client --: response({ success: true, data: newBooking })
+
+@enduml

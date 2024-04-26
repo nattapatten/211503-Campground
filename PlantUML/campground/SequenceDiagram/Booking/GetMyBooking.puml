@@ -1,0 +1,27 @@
+@startuml Get My Bookings
+
+header Sample Booking Sequence Diagram
+footer Page %page% of %lastpage%
+title "Get My Bookings"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:bookings" as routerBookings
+participant "<<middleware>>\n:Auth" as AuthMiddleware
+participant "<<controllers>>\n:bookings" as controllersBookings
+participant "<<model>>\n:Booking" as modelBooking
+database "<<MongoDB>>\n:bookingDB" as BookingDatabase
+
+client->server ++: req.get('/bookings/me')
+server->routerBookings ++: app.use('/bookings', bookingsRouter)
+routerBookings -> AuthMiddleware ++: protect
+AuthMiddleware -> controllersBookings ++: getMyBookings()
+controllersBookings -> modelBooking ++: find({user: req.user.id})
+modelBooking -> BookingDatabase ++: find({user: req.user.id})
+BookingDatabase --> modelBooking --: bookingResults
+modelBooking -> BookingDatabase ++: populate('campground', 'name province tel')
+BookingDatabase --> modelBooking --: populatedBookings
+controllersBookings <-- modelBooking --: bookings
+controllersBookings->client --: response({ success: true, count: bookings.length, data: bookings })
+
+@enduml
