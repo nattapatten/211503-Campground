@@ -17,9 +17,13 @@ const BookingSchema = new mongoose.Schema({
         required: true
 
     },
+    addOnServices: [{
+        type: mongoose.Schema.ObjectId,
+        ref: 'AddOnService'
+    }],
     createdAt: {
         type: Date,
-        default : Date.now
+        default: Date.now
 
     }
 });

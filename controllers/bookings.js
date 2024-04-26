@@ -1,5 +1,6 @@
 const Booking = require('../models/Booking');
 const Campground = require('../models/Campground');
+const mongoose = require('mongoose');
 
 exports.getBookings = async (req, res, next) => {
     console.log("getBookings")
@@ -123,6 +124,25 @@ exports.addBooking = async (req, res, next) => {
             return res.status(400).json({ success: false, message: `The user with ID ${req.user.id} has already made 3 bookings` });
         }
 
+
+        //Add by nattapat.p
+        // Create an array to store add-on services
+        const addOnServices = [];
+
+        // Loop through the provided add-on services and add them to the array
+        if (req.body.addOnServices && Array.isArray(req.body.addOnServices)) {
+            for (const addOnService of req.body.addOnServices) {
+                // Correctly use 'new' to create a new ObjectId instance
+                addOnServices.push({ _id: new mongoose.Types.ObjectId(addOnService._id) });
+            }
+        }
+
+        // Set the add-on services array in the request body
+        req.body.addOnServices = addOnServices;
+        //End Add by nattapat.p
+
+
+
         const booking = await Booking.create(req.body);
         res.status(200).json({
             success: true,
@@ -148,6 +168,24 @@ exports.updateBooking = async (req, res, next) => {
         if (booking.user.toString() !== req.user.id && req.user.role !== 'admin') {
             return res.status(401).json({ success: false, message: `User ${req.params.id} is not authorized to update this booking` });
         }
+
+        //Add by nattapat.p
+        // Create an array to store add-on services
+        const addOnServices = [];
+
+        // Loop through the provided add-on services and add them to the array
+        if (req.body.addOnServices && Array.isArray(req.body.addOnServices)) {
+            for (const addOnService of req.body.addOnServices) {
+                // Correctly use 'new' to create a new ObjectId instance
+                addOnServices.push({ _id: new mongoose.Types.ObjectId(addOnService._id) });
+            }
+        }
+
+        // Set the add-on services array in the request body
+        req.body.addOnServices = addOnServices;
+        //End Add by nattapat.p
+
+
 
         booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -194,3 +232,4 @@ exports.deleteBooking = async (req, res, next) => {
         return res.status(500).json({ success: false, message: "Cannot delete Booking" });
     }
 }
+

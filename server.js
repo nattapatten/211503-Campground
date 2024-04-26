@@ -40,6 +40,7 @@ connectDB();
 const campgrounds = require('./routes/campgrounds')
 const auth = require('./routes/auth');
 const bookings = require('./routes/bookings');
+const addonservices = require('./routes/addonservices'); //Add by nattapat.p
 
 const app = express();
 const mongoSanitize = require('express-mongo-sanitize');
@@ -70,6 +71,7 @@ app.use(hpp());
 app.use('/api/v1/campgrounds', campgrounds);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/bookings', bookings);
+app.use('/api/v1/addonservices', addonservices);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 // app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 

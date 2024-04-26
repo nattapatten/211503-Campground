@@ -22,8 +22,16 @@ exports.getCampgrounds = async (req, res, next) => {
 
     let queryStr = JSON.stringify(reqQuery);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-    query = Campground.find(JSON.parse(queryStr)).populate('appointments');
-
+    // query = Campground.find(JSON.parse(queryStr)).populate('appointments'); //Edit by nattapat.p  Change appointment to bookings
+    query = Campground.find(JSON.parse(queryStr))
+    .populate({
+        path: 'bookings',
+        select: 'bookingDate user' // Optionally specify fields to fetch
+    })
+    .populate({
+        path: 'addonservices', // Add this line to populate add-on services
+        select: 'serviceType description price availability' // Optionally specify fields to fetch
+    });
 
 
     //Select Fields
@@ -74,20 +82,6 @@ exports.getCampgrounds = async (req, res, next) => {
         res.status(400).json({ success: false });
     }
 
-
-    // try {
-    //     let query;
-    //     let queryStr = JSON.stringify(req.query);
-    //     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-    //     query = Campground.find(JSON.parse(queryStr));
-    //     // const campgrounds = await Campground.find(req.query);
-    //     const campgrounds = await query;
-    //     console.log(req.query)
-    //     res.status(200).json({ success: true, count: campgrounds.length, data: campgrounds });
-    // }
-    // catch (err) {
-    //     res.status(400).json({ success: false });
-    // }
 };
 
 
@@ -97,6 +91,7 @@ exports.getCampgrounds = async (req, res, next) => {
 //     console.log(req.body);
 //     res.status(200).json({success: true, msg: `Show campground ${req.params.id}`});
 // };
+
 
 
 

@@ -54,9 +54,21 @@ CampgroundSchema.virtual('bookings', {
 });
 
 
+//Start Add by nattapat.p 
+// Adding a new virtual for add-on services
+CampgroundSchema.virtual('addonservices', {
+    ref: 'AddOnService',
+    localField: '_id',
+    foreignField: 'campground', //foreignField was used by controller file
+    justOne: false
+});
+//End Add by nattapat.p 
+
+
 CampgroundSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    console.log(`Bookings being removed from campgournd ${this._id}`);
+    console.log(`Bookings and Add-On Services being removed from campgournd ${this._id}`);
     await this.model('Booking').deleteMany({ campgournd: this._id });
+    await this.model('AddOnService').deleteMany({ campground: this._id }); //Add by nattapat.p 
     next();
 });
 
