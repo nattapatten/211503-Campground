@@ -18,7 +18,7 @@ exports.getCampgrounds = async (req, res, next) => {
 
     const removeField = ['select', 'sort', 'page', 'limit'];
     removeField.forEach(param => delete reqQuery[param]);
-    console.log(reqQuery);
+    console.log("getCampgrounds:",reqQuery);
 
     let queryStr = JSON.stringify(reqQuery);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);

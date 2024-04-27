@@ -48,7 +48,7 @@ const CampgroundSchema = new mongoose.Schema({
 CampgroundSchema.virtual('bookings', {
     ref: 'Booking',
     localField: '_id',
-    foreignField: 'campgournd',
+    foreignField: 'campground',
     justOne: false
 
 });
